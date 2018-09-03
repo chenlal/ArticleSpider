@@ -20,7 +20,6 @@ class JobboleSpider(scrapy.Spider):
             collection_nums = re_match_collection.group(1)
         else:
             collection_nums = '0'
-
         comment_nums = response.xpath("//a[@href='#article-comment']/text()").extract()[0].strip()
         re_match_collection = re.match("(\d+).*", comment_nums)
         if re_match_collection:
