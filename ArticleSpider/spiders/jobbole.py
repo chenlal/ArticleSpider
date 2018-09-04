@@ -7,7 +7,7 @@ import scrapy
 class JobboleSpider(scrapy.Spider):
     name = 'jobbole'
     allowed_domains = ['blog.jobbole.com']
-    start_urls = ['http://blog.jobbole.com/114334/']
+    start_urls = ['http://blog.jobbole.com/110287/']
 
     def parse(self, response):
 
@@ -47,17 +47,18 @@ class JobboleSpider(scrapy.Spider):
         else:
             collection_nums = '0'
 
-        comment_nums = response.css("a[href='#article-comment']::text").extract()
-        if comment_nums == []:
-            comment_nums = '0'
+        comment_nums = response.css("a[href='#article-comment']::text").extract()[0].strip()
+        if comment_nums:
+            re_match_collection = re.match("(\d+).*", comment_nums)
+            if re_match_collection:
+                comment_nums = re_match_collection.group(1)
+            else:
+                comment_nums = '0'
         else:
-            comment_nums[0].strip()
-        re_match_collection = re.match("(\d+).*", comment_nums)
-        if re_match_collection:
-            comment_nums = re_match_collection.group(1)
-        else:
             comment_nums = '0'
-        creator = response.css(".copyright-area a::text").extract()[0]
+        creator_list = response.css(".copyright-area a::text").extract()
+        creator_list = [element for element in creator_list]
+        creator = "·".join(creator_list)
         content = response.css(".entry").extract()
         tag_list = response.css("p.entry-meta-hide-on-mobile a::text").extract()
         tag_list = [element for element in tag_list if not element.strip().endswith("评论")]
